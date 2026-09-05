@@ -17,6 +17,7 @@ def load_data(filename):
 
 # Encoding categorical variables
 def encode_categorical_variables(data):
+    data = data.drop(columns=["Defense Against the Dark Arts"])
     data = pd.get_dummies(data, columns=["Best Hand"], drop_first=True)
     data["Birthday"] = pd.to_datetime(data["Birthday"], errors='coerce')
     data["Birthday"] = data["Birthday"].dt.strftime('%Y%m%d')
