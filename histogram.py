@@ -3,11 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import argparse
-
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 import sys
+
 
 def find_homogeneous_course(df, column):
     try:
@@ -18,13 +15,27 @@ def find_homogeneous_course(df, column):
         sns.histplot(data=df, x=column, hue='Hogwarts House', element="poly")
         
         plt.title(f"Score Distribution: {column}")
-        plt.xlabel("Score")
+        plt.xlabel("")
         plt.ylabel("Frequency")
         plt.show()
 
     except Exception as e:
         print(f"Error: {e}.")
         exit(1)
+
+
+def show_all_courses_histograms(data):
+    fig, axes = plt.subplots(nrows=4, ncols=4, figsize=(40, 32))
+    columns = data.select_dtypes(include=[np.number]).columns
+    for i, col in enumerate(columns):
+        ax = axes[i // 4, i % 4]
+        sns.histplot(data=data, x=col, hue='Hogwarts House', element="poly", ax=ax)
+        ax.set_title(f"Score Distribution: {col}")
+        ax.set_xlabel("")
+        ax.set_ylabel("Frequency")
+    plt.tight_layout()
+    plt.show()
+
 
 if __name__ == "__main__":
     parcer = argparse.ArgumentParser(description="Histogram expect dataset in a .csv file")
@@ -44,6 +55,9 @@ if __name__ == "__main__":
     if column is None:
         column = "Care of Magical Creatures"
     if column not in columns:
+        if column == "all":
+            show_all_courses_histograms(data)
+            exit(0)
         print(f"Error: column '{column}' not a Hogwarts course.")
         exit(1)
     find_homogeneous_course(data, column)

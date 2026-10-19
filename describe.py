@@ -37,7 +37,7 @@ def get_quartiles(data):
     return q1, q2, q3
 
 
-def describe(data):
+def fn_describe(data):
     columns = []
     all_cloumns = data.columns
     for col in all_cloumns:
@@ -45,10 +45,12 @@ def describe(data):
             columns.append(col)
 
     n_data = data[columns]
-    descripe = pd.DataFrame(index=["count", "mean", "std", "min", "25%", "50%", "75%", "max", "nan"], columns=columns)
+    # nan and type for Bonus original describe function does not have them
+    describe_df = pd.DataFrame(index=["count", "mean", "std", "min", "25%", "50%", "75%", "max", "nan", "type"], columns=columns)
     for col in columns:
         count = sum([1 for i in range(n_data[col].size) if not math.isnan(n_data[col][i])])
-        nan = sum([1 for x in n_data[col] if math.isnan(x)])
+        nan = data.shape[0] - count
+        col_type = type(data[col][0]).__name__
         if count > 0:
             mean = sum([n_data[col][i] for i in range(n_data[col].size) if not math.isnan(n_data[col][i])]) / count
             min = math.inf 
@@ -63,8 +65,8 @@ def describe(data):
                     std += (n_data[col][i] - mean) ** 2
             std = math.sqrt(std / (count-1))
             q1, q2, q3 = get_quartiles(n_data[col])
-            descripe[col] = [count, mean, std, min, q1, q2, q3, max, nan]
-    return descripe
+            describe_df[col] = [count, mean, std, min, q1, q2, q3, max, nan, col_type]
+    return describe_df
 
 
 if __name__ == "__main__":
@@ -79,5 +81,5 @@ if __name__ == "__main__":
         print(f"Error reading file: {e}")
         exit(1)
 
-    descripe = describe(data)
-    print(descripe)
+    describe_df = fn_describe(data)
+    print(describe_df)

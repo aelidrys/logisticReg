@@ -3,12 +3,13 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 import argparse
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def load_data(filename):
     try:
         data = pd.read_csv(filename)
-        data = data.drop(columns=["Index", "First Name", "Last Name"])
         return data
     except Exception as e:
         print(f"Error while loading data: {e}")
@@ -16,13 +17,18 @@ def load_data(filename):
 
 
 # Encoding categorical variables
-def encode_categorical_variables(data):
-    data = data.drop(columns=["Defense Against the Dark Arts"])
-    data = pd.get_dummies(data, columns=["Best Hand"], drop_first=True)
+def encode_categorical_variables(data, test=False):
+
     data["Birthday"] = pd.to_datetime(data["Birthday"], errors='coerce')
-    data["Birthday"] = data["Birthday"].dt.strftime('%Y%m%d')
-    label_encoder = LabelEncoder()
-    data["Hogwarts House"] = label_encoder.fit_transform(data["Hogwarts House"])
+    data['Birth_year'] = data['Birthday'].dt.year
+    columns_to_drop = ["Index", "First Name", "Last Name", "Defense Against the Dark Arts", "Birthday"]
+    data = data.drop(columns=columns_to_drop, errors='ignore')
+    data = pd.get_dummies(data, columns=["Best Hand"], drop_first=True)
+    if test:
+        data = data.drop(columns=["Hogwarts House"], errors='ignore')
+    else:
+        label_encoder = LabelEncoder()
+        data["Hogwarts House"] = label_encoder.fit_transform(data["Hogwarts House"])
     return data
 
 
@@ -48,6 +54,7 @@ def show_pair_plot(data):
     plt.show()
 
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a pair plot from CSV data")
     parser.add_argument("filename", help="Path to the CSV file")
@@ -61,5 +68,7 @@ if __name__ == "__main__":
     # encode categorical columns
     data = encode_categorical_variables(data)
 
-    # Pair plot
+    # show Pair Plot
     show_pair_plot(data)
+
+
