@@ -22,10 +22,8 @@ def load_data(filename):
 def preprocess_data(data, test=False, means=None):
 
     data["Birthday"] = pd.to_datetime(data["Birthday"], errors='coerce')
-    data['Birth_year'] = data['Birthday'].dt.strftime('%Y%m%d').astype(float)
-    columns_to_drop = ["Index", "First Name", "Last Name", "Defense Against the Dark Arts", 'Birthday', 'Best Hand_Right', 'Arithmics', 'Care of Magical Creatures']
+    columns_to_drop = ["Index", "First Name", "Last Name", "Defense Against the Dark Arts", 'Birthday', 'Best Hand', 'Arithmancy', 'Care of Magical Creatures']
     data = data.drop(columns=columns_to_drop, errors='ignore')
-    data = pd.get_dummies(data, columns=["Best Hand"], drop_first=True)
 
     columns = data.select_dtypes(include=[np.number]).columns.tolist()
     columns.remove('Hogwarts House') if 'Hogwarts House' in columns else None
